@@ -9,6 +9,18 @@ const saveTask = (title, description) =>
     description: description
   })
 
+const getTasks = () => db.collection('tasks').get()
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const querySnapshot = await getTasks()
+  querySnapshot.forEach(doc => {
+    //imprimiendo los titulos de las tareas
+    console.log(doc.data().title)
+  })
+})
+
+
 taskForm.addEventListener('submit', async (e) => {
   e.preventDefault()
 
