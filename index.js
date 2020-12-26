@@ -11,28 +11,32 @@ const saveTask = (title, description) =>
 
 const getTasks = () => db.collection('tasks').get()
 
+const onGetTasks = (callback) => db.collection('tasks').onSnapshot(callback)
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const querySnapshot = await getTasks()
-  querySnapshot.forEach(doc => {
+  onGetTasks((querySnapshot) => {
+    tasksContainer.innerHTML = ''
 
-    console.log(doc.data().title)
-    const task = doc.data()
+    querySnapshot.forEach(doc => {
 
-    tasksContainer.innerHTML += `
-    <div class="card card-body mt-2 border-primary">
-      <h5>
-        ${task.title}
-      </h5>
-      <p>
-        ${task.description}
-      </p>
-      <div>
-        <button class="btn btn-primary">Delete</button>
-        <button class="btn btn-secondary">Edit</button>
-      </div>
-    </div>`
-
+      console.log(doc.data().title)
+      const task = doc.data()
+  
+      tasksContainer.innerHTML += `
+      <div class="card card-body mt-2 border-primary">
+        <h5>
+          ${task.title}
+        </h5>
+        <p>
+          ${task.description}
+        </p>
+        <div>
+          <button class="btn btn-primary">Delete</button>
+          <button class="btn btn-secondary">Edit</button>
+        </div>
+      </div>`
+  
+    })
   })
 })
 
