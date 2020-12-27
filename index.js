@@ -4,6 +4,7 @@ const taskForm = document.getElementById("task-form")
 const tasksContainer = document.getElementById("tasks-container")
 
 let editStatus = false
+let id = ''
 
 const saveTask = (title, description) => 
   db.collection('tasks').doc().set({
@@ -18,6 +19,8 @@ const getTask = (id) => db.collection('tasks').doc(id).get()
 const onGetTasks = (callback) => db.collection('tasks').onSnapshot(callback)
 
 const deleteTask = id => db.collection('tasks').doc(id).delete()
+
+const updateTask = (id, updateDoc) => db.collection('tasks').doc(id).update(updateDoc)
 
 window.addEventListener('DOMContentLoaded', async () => {
   onGetTasks((querySnapshot) => {
@@ -55,15 +58,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', async (e) => {
         const doc = await getTask(e.target.dataset.id)
         const task = doc.data()
+        editStatus = true
+        id = doc.id
         
         taskForm['task-title'].value = task.title
         taskForm['task-description'].value = task.description
+        taskForm['btn-task-form'].innerText = 'Update'
+
       })
     })
 
   })
 })
-
 
 taskForm.addEventListener('submit', async (e) => {
   e.preventDefault()
@@ -71,7 +77,19 @@ taskForm.addEventListener('submit', async (e) => {
   const title = taskForm['task-title']
   const description = taskForm['task-description']
 
-  await saveTask(title.value, description.value)
+  if(!editStatus){
+    await saveTask(title.value, description.value)
+  } else {
+    await updateTask(id, {
+      title: title.value,
+      description: description.value
+    })
+    editStatus = false
+    taskForm['btn-task-form'].innerText = 'Save'
+    id = ''
+
+  }
+
 
   taskForm.reset()
   title.focus()
